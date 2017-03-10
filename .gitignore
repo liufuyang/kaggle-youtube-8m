@@ -1,0 +1,4 @@
+.ipynb_checkpoints
+data/*
+google-cloud-sdk
+venv
