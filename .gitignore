@@ -1,8 +1,10 @@
 
 .ipynb_checkpoints
 data/*
+.env
 google-cloud-sdk
 venv
+tf-venv
 
 
 # Byte-compiled / optimized / DLL files
