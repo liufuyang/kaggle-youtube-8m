@@ -1,7 +1,9 @@
-# example-2-simple-mnist.py
+# example-3-simple-sentiment.py
 import tensorflow as tf
+import numpy as np
 from datetime import datetime
 import time
+import cPickle as pickle
 
 # reset everything to rerun in jupyter
 tf.reset_default_graph()
@@ -10,41 +12,51 @@ tf.reset_default_graph()
 batch_size = 100
 learning_rate = 0.5
 training_epochs = 6
-logs_path = './tmp/example-2/' + datetime.now().isoformat()
+logs_path = './tmp/example-3/' + datetime.now().isoformat()
 
-# load mnist data set
-from tensorflow.examples.tutorials.mnist import input_data
-mnist = input_data.read_data_sets('tmp/MNIST_data', one_hot=True)
+N_Class = 2
+N_X = 423 # len(train_x[0])
+layer1_size = 30
+
+train_x, train_y, test_x, test_y = pickle.load( open('tmp/sentiment_set.pickle', 'rb' ) )
 
 # input images
 with tf.name_scope('input'):
-    # None -> batch size can be any size, 784 -> flattened mnist image
-    x = tf.placeholder(tf.float32, shape=[None, 784], name="x-input") 
+    # None -> batch size can be any size
+    x = tf.placeholder(tf.float32, shape=[None, N_X], name="x-input") 
     # target 10 output classes
-    y_ = tf.placeholder(tf.float32, shape=[None, 10], name="y-input")
+    y_ = tf.placeholder(tf.float32, shape=[None, N_Class], name="y-input")
 
 # model parameters will change during training so we use tf.Variable
 with tf.name_scope("weights"):
-    W = tf.Variable(tf.zeros([784, 10]))
+    W1 = tf.Variable(tf.truncated_normal([N_X, layer1_size], stddev=0.1)) # version 2 change
+    W = tf.Variable(tf.truncated_normal([layer1_size, N_Class], stddev=1.0))
 
 # bias
 with tf.name_scope("biases"):
-    b = tf.Variable(tf.zeros([10]))
+    b1 = tf.Variable(tf.zeros([layer1_size]))
+    b = tf.Variable(tf.zeros([N_Class]))
+
+with tf.name_scope('hidden_layers'):
+    y1 = tf.nn.relu(tf.matmul(x, W1) + b1)
 
 # implement model
 with tf.name_scope("softmax"):
     # y is our prediction
-    y = tf.nn.softmax(tf.matmul(x,W) + b)
+    ylogits = tf.matmul(y1, W) + b
+    y = tf.nn.softmax(ylogits)
 
 # specify cost function
 with tf.name_scope('cross_entropy'):
     # this is our cost
-    cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
+    cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits=ylogits, labels=y_)
+    cross_entropy = tf.reduce_mean(cross_entropy)
 
 # specify optimizer
 with tf.name_scope('train'):
     # optimizer is an "operation" which we can execute in a session
-    train_op = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy)
+    train_op = tf.train.AdamOptimizer(learning_rate=0.001).minimize(cross_entropy)
+    # version 2 change, previous using GradientDescentOptimizer(learning_rate)
 
 with tf.name_scope('accuracy'):
     # Accuracy
@@ -69,15 +81,17 @@ with tf.Session() as sess:
         
     # perform training cycles
     for epoch in range(training_epochs):
-        
         # number of batches in one epoch
-        batch_count = int(mnist.train.num_examples/batch_size)
-        
-        for i in range(batch_count):
-            batch_x, batch_y = mnist.train.next_batch(batch_size)
+        batch_count = int(len(train_x)/batch_size)
+        i = 0
+        while i < len(train_x):
+            start = i
+            end = i + batch_size
+            batch_x = np.array(train_x[start:end])
+            batch_y = np.array(train_y[start:end])
             
             # perform the operations we defined earlier on batch
-            _, train_cost, train_acc, _train_cost_summary, _train_acc_summary = 
+            _, train_cost, train_acc, _train_cost_summary, _train_acc_summary = \
                 sess.run([train_op, cross_entropy, accuracy, train_cost_summary, train_acc_summary], 
                     feed_dict={x: batch_x, y_: batch_y})
             # write log
@@ -86,19 +100,19 @@ with tf.Session() as sess:
 
             if i % 100 == 0:
                 # for log on test data:
-                test_cost, test_acc, _test_cost_summary, _test_acc_summary = 
+                test_cost, test_acc, _test_cost_summary, _test_acc_summary = \
                     sess.run([cross_entropy, accuracy, test_cost_summary, test_acc_summary], 
-                        feed_dict={x: mnist.test.images, y_: mnist.test.labels})
+                        feed_dict={x: test_x, y_: test_y})
                 # write log
                 writer.add_summary(_test_cost_summary, epoch * batch_count + i)
                 writer.add_summary(_test_acc_summary, epoch * batch_count + i)
                 
                 print('Epoch {0:3d}, Batch {1:3d} | Train Cost: {2:.2f} | Test Cost: {3:.2f} | Accuracy batch train: {4:.2f} | Accuracy test: {5:.2f}'
                     .format(epoch, i, train_cost, test_cost, train_acc, test_acc))
-            
-    print('Accuracy: {}'.format(accuracy.eval(feed_dict={x: mnist.test.images, y_: mnist.test.labels})))
+            i += batch_size
+    print('Accuracy: {}'.format(accuracy.eval(feed_dict={x: test_x , y_: test_y})))
     print('done')
 
-# tensorboard --logdir=./tmp/example-2 --port=8002 --reload_interval=5
+# tensorboard --logdir=./tmp/example-3 --port=8002 --reload_interval=5
 # You can run the following js code in broswer console to make tensooboard to do auto-refresh
 # setInterval(function() {document.getElementById('reload-button').click()}, 5000);

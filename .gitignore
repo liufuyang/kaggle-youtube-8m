@@ -5,6 +5,8 @@ data/*
 google-cloud-sdk
 venv
 tf-venv
+tmp
+
 
 
 # Byte-compiled / optimized / DLL files

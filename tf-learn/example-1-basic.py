@@ -27,4 +27,4 @@ for i in range(10):
     
     print(_y)
 
-# tensooboard --logdir=./tmp/example-1 --port=8001
+# tensorboard --logdir=./tmp/example-1 --port=8001
