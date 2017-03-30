@@ -7,7 +7,9 @@ from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 import numpy as np
 import random
-import cPickle as pickle
+# import cPickle as pickle # for python2
+import pickle
+import os
 from collections import Counter
 
 import io
@@ -72,5 +74,14 @@ def create_feature_sets_and_labels(pos, neg, test_size=0.2):
 if __name__ == '__main__':
     train_x, train_y, test_x, test_y = \
         create_feature_sets_and_labels('pos.txt', 'neg.txt', test_size=0.2)
-    with open('tmp/sentiment_set.pickle', 'wb') as f:
+    
+    # dump pickle file ...
+    filename = 'tmp/sentiment_set.pickle'
+    if not os.path.exists(os.path.dirname(filename)):
+        try:
+            os.makedirs(os.path.dirname(filename))
+        except OSError as exc: # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+    with open(filename, 'wb') as f:
         pickle.dump([train_x, train_y, test_x, test_y], f)

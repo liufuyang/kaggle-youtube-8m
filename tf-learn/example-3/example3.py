@@ -3,7 +3,8 @@ import tensorflow as tf
 import numpy as np
 from datetime import datetime
 import time
-import cPickle as pickle
+# import cPickle as pickle
+import pickle
 
 # reset everything to rerun in jupyter
 tf.reset_default_graph()
@@ -16,7 +17,7 @@ logs_path = './tmp/example-3/' + datetime.now().isoformat()
 
 N_Class = 2
 N_X = 423 # len(train_x[0])
-layer1_size = 30
+layer1_size = 32
 
 train_x, train_y, test_x, test_y = pickle.load( open('tmp/sentiment_set.pickle', 'rb' ) )
 
