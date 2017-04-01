@@ -30,8 +30,8 @@ Y_test = np_utils.to_categorical(y_test, 10)
 # 7. Define model architecture
 model = Sequential()
 
-model.add(Convolution2D(80, (6, 6), activation='relu', input_shape=(28,28,1)))
-model.add(Convolution2D(60, (6, 6), activation='relu'))
+model.add(Convolution2D(32, (6, 6), activation='relu', input_shape=(28,28,1)))
+model.add(Convolution2D(20, (6, 6), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2,2)))
 model.add(Dropout(0.25))
 
@@ -52,4 +52,5 @@ model.fit(X_train, Y_train,
 model.save('model.h5')
 # 10. Evaluate model on test data
 score = model.evaluate(X_test, Y_test, verbose=0)
-print(score)
+print('Test loss:', score[0])
+print('Test accuracy:', score[1])
