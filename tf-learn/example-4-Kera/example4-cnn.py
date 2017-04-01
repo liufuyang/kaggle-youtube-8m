@@ -10,6 +10,8 @@ from keras.layers import Convolution2D, MaxPooling2D
 from keras.utils import np_utils
 from keras.datasets import mnist
 
+batch_size = 128
+
 # 4. Load pre-shuffled MNIST data into train and test sets
 (X_train, y_train), (X_test, y_test) = mnist.load_data()
 
@@ -45,9 +47,9 @@ model.compile(loss='categorical_crossentropy',
 
 # 9. Fit model on training data
 model.fit(X_train, Y_train,
-          batch_size=32, epochs=10, verbose=1,
+          batch_size=batch_size, epochs=10, verbose=1,
           validation_data=(X_test, Y_test))
 model.save('model.h5')
 # 10. Evaluate model on test data
 score = model.evaluate(X_test, Y_test, verbose=0)
-model.save
+print(score)
