@@ -6,6 +6,7 @@ import nltk
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 import numpy as np
+from scipy import sparse
 import random
 # import cPickle as pickle # for python2
 import pickle
@@ -68,7 +69,14 @@ def create_feature_sets_and_labels(pos, neg, test_size=0.2):
 
     test_x = list(features[:, 0][-testing_size:]) # getting the features
     test_y = list(features[:, 1][-testing_size:])
-
+    
+    # format output matrices
+    train_x = sparse.csr_matrix(train_x, dtype=np.float32)
+    test_x = sparse.csr_matrix(test_x, dtype=np.float32)
+    
+    train_y = np.array(train_y)
+    test_y = np.array(test_y)
+    
     return train_x, train_y, test_x, test_y, lexicon
 
 if __name__ == '__main__':

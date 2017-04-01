@@ -1,6 +1,8 @@
 # example-3-simple-sentiment.py
-import tensorflow as tf
 import numpy as np
+np.random.seed(42)
+import tensorflow as tf
+tf.set_random_seed(42)
 from datetime import datetime
 import time
 # import cPickle as pickle
@@ -20,6 +22,8 @@ N_X = 423 # len(train_x[0])
 layer1_size = 32
 
 train_x, train_y, test_x, test_y = pickle.load( open('tmp/sentiment_set.pickle', 'rb' ) )
+train_x = train_x.toarray()
+test_x = test_x.toarray()
 
 # input images
 with tf.name_scope('input'):

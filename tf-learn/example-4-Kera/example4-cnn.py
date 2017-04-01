@@ -1,6 +1,8 @@
 # 3. Import libraries and modules
 import numpy as np
 np.random.seed(123)  # for reproducibility
+import tensorflow as tf
+tf.set_random_seed(123)
 
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
@@ -43,7 +45,8 @@ model.compile(loss='categorical_crossentropy',
 
 # 9. Fit model on training data
 model.fit(X_train, Y_train,
-          batch_size=32, epochs=10, verbose=1)
+          batch_size=32, epochs=10, verbose=1,
+          validation_data=(X_test, Y_test))
 model.save('model.h5')
 # 10. Evaluate model on test data
 score = model.evaluate(X_test, Y_test, verbose=0)
