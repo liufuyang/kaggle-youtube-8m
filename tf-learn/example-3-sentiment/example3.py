@@ -22,7 +22,7 @@ N_X = 423 # len(train_x[0])
 layer1_size = 32
 
 train_x, train_y, test_x, test_y = pickle.load( open('tmp/sentiment_set.pickle', 'rb' ) )
-train_x = train_x.toarray()
+train_x = train_x.toarray() # as we stored the data as sparse matrix, restore them back to numpy array
 test_x = test_x.toarray()
 
 # input images
