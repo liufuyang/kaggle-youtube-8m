@@ -31,7 +31,8 @@ Y_test = np_utils.to_categorical(y_test, 10)
 model = Sequential()
 
 model.add(Convolution2D(32, (6, 6), activation='relu', input_shape=(28,28,1)))
-model.add(Convolution2D(20, (6, 6), activation='relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Convolution2D(20, (4, 4), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2,2)))
 model.add(Dropout(0.25))
 
