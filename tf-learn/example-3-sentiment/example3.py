@@ -79,7 +79,7 @@ test_acc_summary = tf.summary.scalar("test_accuracy", accuracy)
 
 with tf.Session() as sess:
     # variables need to be initialized before we can use them
-    sess.run(tf.initialize_all_variables())
+    sess.run(tf.global_variables_initializer())
 
     # create log writer object
     writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph())
@@ -89,7 +89,7 @@ with tf.Session() as sess:
         # number of batches in one epoch
         batch_count = int(len(train_x)/batch_size)
         i = 0
-        while i < len(train_x):
+        for _b in range(batch_count):
             start = i
             end = i + batch_size
             batch_x = np.array(train_x[start:end])
@@ -100,8 +100,8 @@ with tf.Session() as sess:
                 sess.run([train_op, cross_entropy, accuracy, train_cost_summary, train_acc_summary], 
                     feed_dict={x: batch_x, y_: batch_y})
             # write log
-            writer.add_summary(_train_cost_summary, epoch * batch_count + i)
-            writer.add_summary(_train_acc_summary, epoch * batch_count + i)
+            writer.add_summary(_train_cost_summary, epoch * batch_count + _b)
+            writer.add_summary(_train_acc_summary, epoch * batch_count + _b)
 
             if i % 100 == 0:
                 # for log on test data:
@@ -109,8 +109,8 @@ with tf.Session() as sess:
                     sess.run([cross_entropy, accuracy, test_cost_summary, test_acc_summary], 
                         feed_dict={x: test_x, y_: test_y})
                 # write log
-                writer.add_summary(_test_cost_summary, epoch * batch_count + i)
-                writer.add_summary(_test_acc_summary, epoch * batch_count + i)
+                writer.add_summary(_test_cost_summary, epoch * batch_count + _b)
+                writer.add_summary(_test_acc_summary, epoch * batch_count + _b)
                 
                 print('Epoch {0:3d}, Batch {1:3d} | Train Cost: {2:.2f} | Test Cost: {3:.2f} | Accuracy batch train: {4:.2f} | Accuracy test: {5:.2f}'
                     .format(epoch, i, train_cost, test_cost, train_acc, test_acc))
