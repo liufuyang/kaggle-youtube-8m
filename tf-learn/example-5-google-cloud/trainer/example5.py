@@ -127,7 +127,7 @@ def train_model(train_file='sentiment_set.pickle', job_dir='./tmp/example-5', **
         writer.flush()
         print('Accuracy: {}'.format(accuracy.eval(feed_dict={x: test_x , y_: test_y})))
         print('done')
-# tensorboard --logdir=./tmp/example-3 --port=8002 --reload_interval=5
+# tensorboard --logdir=./tmp/example-5/logs --port=8000 --reload_interval=5
 # You can run the following js code in broswer console to make tensooboard to do auto-refresh
 # setInterval(function() {document.getElementById('reload-button').click()}, 5000);
 
